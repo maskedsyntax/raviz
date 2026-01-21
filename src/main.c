@@ -81,6 +81,7 @@ void* audio_thread_func(void *arg) {
 int main(int argc, char **argv) {
     RavizConfig config;
     config_init_defaults(&config);
+    config_load(&config);
     if (config_parse_args(&config, argc, argv)) {
         return 0; 
     }

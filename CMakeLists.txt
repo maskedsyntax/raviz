@@ -64,6 +64,7 @@ find_package(OpenGL REQUIRED)
 find_package(Threads REQUIRED)
 
 include_directories(include src)
+include_directories(external/include)
 include_directories(${PULSE_INCLUDE_DIRS})
 include_directories(${FFTW_INCLUDE_DIRS})
 include_directories(${GLFW_INCLUDE_DIRS})
@@ -77,6 +78,7 @@ set(SOURCES
     src/render/render.c
     src/render/gl_loader.c
     src/utils/config.c
+    external/src/toml.c
 )
 
 if (USE_STUBS)

@@ -29,6 +29,9 @@ typedef struct {
 // Initialize with defaults
 void config_init_defaults(RavizConfig *config);
 
+// Load from config file (creates default if missing)
+void config_load(RavizConfig *config);
+
 // Parse CLI args (simple version)
 int config_parse_args(RavizConfig *config, int argc, char **argv);
 
