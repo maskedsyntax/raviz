@@ -27,6 +27,9 @@ struct RenderContext {
     
     float time;
     float fft_data[MAX_FFT_BINS];
+
+    // Runtime state
+    int wireframe_mode; // 0: Fill, 1: Line, 2: Point
 };
 
 const char *vs_source = "#version 330 core\n"
@@ -44,7 +47,6 @@ const char *vs_source = "#version 330 core\n"
     "out vec3 vPos;\n"
     "out float vDisplacement;\n"
     "\n"
-    "// Simple pseudo-random noise\n"
     "float random(vec3 st) {\n"
     "    return fract(sin(dot(st.xyz, vec3(12.9898,78.233,45.5432))) * 43758.5453123);\n"
     "}\n"
@@ -86,18 +88,33 @@ const char *fs_source = "#version 330 core\n"
     "uniform float time;\n"
     "uniform int color_mode;\n"
     "\n"
+    "// 0: None (Blue/Purple), 1: Static (White/Gold), 2: Reactive (Rainbow)\n"
+    "\n"
+    "vec3 hsv2rgb(vec3 c) {\n"
+    "    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\n"
+    "    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\n"
+    "    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\n"
+    "}\n"
+    "\n"
     "void main() {\n"
     "    vec3 norm = normalize(vNormal);\n"
-    "    vec3 viewDir = normalize(-vPos); \n"
-    "    \n"
-    "    // Fresnel glow\n"
     "    float fresnel = pow(1.0 - max(dot(norm, vec3(0.0, 0.0, 1.0)), 0.0), 3.0);\n"
     "    \n"
-    "    vec3 color = vec3(0.1, 0.4, 0.8); \n"
+    "    vec3 base_color = vec3(0.1, 0.4, 0.8);\n"
+    "    vec3 glow_color = vec3(0.5, 0.8, 1.0);\n"
     "    \n"
+    "    if (color_mode == 1) { // Static (Golden/Warm)\n"
+    "        base_color = vec3(0.8, 0.5, 0.1);\n"
+    "        glow_color = vec3(1.0, 0.8, 0.5);\n"
+    "    } else if (color_mode == 2) { // Reactive (Rainbow)\n"
+    "        float hue = fract(time * 0.1 + vDisplacement);\n"
+    "        base_color = hsv2rgb(vec3(hue, 0.8, 0.8));\n"
+    "        glow_color = hsv2rgb(vec3(hue + 0.1, 0.5, 1.0));\n"
+    "    }\n"
+    "    \n"
+    "    vec3 color = base_color;\n"
     "    color += vec3(0.8, 0.2, 0.5) * vDisplacement * 5.0;\n"
-    "    \n"
-    "    color += vec3(0.5, 0.8, 1.0) * fresnel * 0.8;\n"
+    "    color += glow_color * fresnel * 0.8;\n"
     "    \n"
     "    FragColor = vec4(color, 1.0);\n"
     "}\n";
@@ -116,6 +133,85 @@ GLuint compile_shader(GLenum type, const char *source) {
         return 0;
     }
     return shader;
+}
+
+void reload_shaders(RenderContext *ctx) {
+    if (!ctx) return;
+    
+    GLuint vs = compile_shader(GL_VERTEX_SHADER, vs_source);
+    if (!vs) return;
+    GLuint fs = compile_shader(GL_FRAGMENT_SHADER, fs_source);
+    if (!fs) { glDeleteShader(vs); return; }
+    
+    GLuint new_program = glCreateProgram();
+    glAttachShader(new_program, vs);
+    glAttachShader(new_program, fs);
+    glLinkProgram(new_program);
+    
+    int success;
+    glGetProgramiv(new_program, GL_LINK_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetProgramInfoLog(new_program, 512, NULL, infoLog);
+        fprintf(stderr, "Program linking failed: %s\n", infoLog);
+        glDeleteShader(vs);
+        glDeleteShader(fs);
+        glDeleteProgram(new_program);
+        return;
+    }
+    
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+    
+    // Replace old program
+    glDeleteProgram(ctx->shader_program);
+    ctx->shader_program = new_program;
+    
+    // Re-fetch uniforms
+    ctx->u_time = glGetUniformLocation(ctx->shader_program, "time");
+    ctx->u_fft_data = glGetUniformLocation(ctx->shader_program, "fft_data");
+    ctx->u_model = glGetUniformLocation(ctx->shader_program, "model");
+    ctx->u_view = glGetUniformLocation(ctx->shader_program, "view");
+    ctx->u_projection = glGetUniformLocation(ctx->shader_program, "projection");
+    ctx->u_intensity = glGetUniformLocation(ctx->shader_program, "intensity");
+    ctx->u_color_mode = glGetUniformLocation(ctx->shader_program, "color_mode");
+    
+    printf("Shaders reloaded.\n");
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    RenderContext *ctx = (RenderContext*)glfwGetWindowUserPointer(window);
+    if (!ctx || action != GLFW_PRESS) return;
+    
+    switch (key) {
+        case GLFW_KEY_ESCAPE:
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+            break;
+        case GLFW_KEY_F1: // Cycle Color Mode
+            ctx->config.color_mode = (ctx->config.color_mode + 1) % 3;
+            printf("Color Mode: %d\n", ctx->config.color_mode);
+            break;
+        case GLFW_KEY_F4: // Cycle Wireframe Mode
+            ctx->wireframe_mode = (ctx->wireframe_mode + 1) % 3;
+             // 0: Fill, 1: Line, 2: Point
+             if (ctx->wireframe_mode == 0) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+             else if (ctx->wireframe_mode == 1) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+             else glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+            printf("Render Mode: %d\n", ctx->wireframe_mode);
+            break;
+        case GLFW_KEY_F5: // Reload Shaders
+            reload_shaders(ctx);
+            break;
+        case GLFW_KEY_UP:
+            ctx->config.intensity += 0.1f;
+            printf("Intensity: %.1f\n", ctx->config.intensity);
+            break;
+        case GLFW_KEY_DOWN:
+            ctx->config.intensity -= 0.1f;
+            if (ctx->config.intensity < 0.0f) ctx->config.intensity = 0.0f;
+            printf("Intensity: %.1f\n", ctx->config.intensity);
+            break;
+    }
 }
 
 void generate_sphere(int lat_segments, int lon_segments, GLuint *vao, GLuint *vbo, GLuint *ebo, int *num_indices) {
@@ -193,6 +289,7 @@ RenderContext* render_init(const RavizConfig *config) {
     
     ctx->config = *config;
     ctx->time = 0.0f;
+    ctx->wireframe_mode = 0;
     for(int i=0; i<MAX_FFT_BINS; i++) ctx->fft_data[i] = 0.0f;
     
     glfwSetErrorCallback(error_callback);
@@ -218,6 +315,10 @@ RenderContext* render_init(const RavizConfig *config) {
         free(ctx);
         return NULL;
     }
+    
+    // Set user pointer for callbacks
+    glfwSetWindowUserPointer(ctx->window, ctx);
+    glfwSetKeyCallback(ctx->window, key_callback);
     
     glfwMakeContextCurrent(ctx->window);
     glfwSetFramebufferSizeCallback(ctx->window, framebuffer_size_callback);
@@ -247,12 +348,14 @@ RenderContext* render_init(const RavizConfig *config) {
     ctx->u_view = glGetUniformLocation(ctx->shader_program, "view");
     ctx->u_projection = glGetUniformLocation(ctx->shader_program, "projection");
     ctx->u_intensity = glGetUniformLocation(ctx->shader_program, "intensity");
+    ctx->u_color_mode = glGetUniformLocation(ctx->shader_program, "color_mode");
     
     generate_sphere(config->sphere_lat, config->sphere_lon, &ctx->vao, &ctx->vbo, &ctx->ebo, &ctx->num_indices);
     
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glPointSize(4.0f); // Make points visible
     
     return ctx;
 }
@@ -280,6 +383,7 @@ void render_draw(RenderContext *ctx) {
     glUniform1f(ctx->u_time, ctx->time);
     glUniform1fv(ctx->u_fft_data, MAX_FFT_BINS, ctx->fft_data);
     glUniform1f(ctx->u_intensity, ctx->config.intensity);
+    glUniform1i(ctx->u_color_mode, ctx->config.color_mode);
     
     int width, height;
     glfwGetFramebufferSize(ctx->window, &width, &height);

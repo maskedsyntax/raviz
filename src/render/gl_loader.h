@@ -27,6 +27,11 @@ typedef ptrdiff_t GLintptr;
 #define GL_LINK_STATUS                    0x8B82
 #define GL_INFO_LOG_LENGTH                0x8B84
 
+#define GL_POINT                          0x1B00
+#define GL_LINE                           0x1B01
+#define GL_FILL                           0x1B02
+#define GL_FRONT_AND_BACK                 0x0408
+
 // Function Pointers
 typedef void (*PFNGLGENBUFFERS)(GLsizei n, GLuint *buffers);
 typedef void (*PFNGLBINDBUFFER)(GLenum target, GLuint buffer);
@@ -45,10 +50,13 @@ typedef void (*PFNGLATTACHSHADER)(GLuint program, GLuint shader);
 typedef void (*PFNGLLINKPROGRAM)(GLuint program);
 typedef void (*PFNGLUSEPROGRAM)(GLuint program);
 typedef void (*PFNGLDELETEPROGRAM)(GLuint program);
+typedef void (*PFNGLGETPROGRAMIV)(GLuint program, GLenum pname, GLint *params);
+typedef void (*PFNGLGETPROGRAMINFOLOG)(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
 
 typedef GLint (*PFNGLGETUNIFORMLOCATION)(GLuint program, const GLchar *name);
 typedef void (*PFNGLUNIFORM1F)(GLint location, GLfloat v0);
 typedef void (*PFNGLUNIFORM1FV)(GLint location, GLsizei count, const GLfloat *value);
+typedef void (*PFNGLUNIFORM1I)(GLint location, GLint v0);
 typedef void (*PFNGLUNIFORMMATRIX4FV)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 
 typedef void (*PFNGLGENVERTEXARRAYS)(GLsizei n, GLuint *arrays);
@@ -76,10 +84,13 @@ extern PFNGLATTACHSHADER glAttachShader;
 extern PFNGLLINKPROGRAM glLinkProgram;
 extern PFNGLUSEPROGRAM glUseProgram;
 extern PFNGLDELETEPROGRAM glDeleteProgram;
+extern PFNGLGETPROGRAMIV glGetProgramiv;
+extern PFNGLGETPROGRAMINFOLOG glGetProgramInfoLog;
 
 extern PFNGLGETUNIFORMLOCATION glGetUniformLocation;
 extern PFNGLUNIFORM1F glUniform1f;
 extern PFNGLUNIFORM1FV glUniform1fv;
+extern PFNGLUNIFORM1I glUniform1i;
 extern PFNGLUNIFORMMATRIX4FV glUniformMatrix4fv;
 
 extern PFNGLGENVERTEXARRAYS glGenVertexArrays;
@@ -88,6 +99,7 @@ extern PFNGLDELETEVERTEXARRAYS glDeleteVertexArrays;
 
 extern PFNGLENABLEVERTEXATTRIBARRAY glEnableVertexAttribArray;
 extern PFNGLVERTEXATTRIBPOINTER glVertexAttribPointer;
+
 
 // Load functions
 int load_gl_functions();

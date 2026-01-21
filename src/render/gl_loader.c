@@ -19,10 +19,13 @@ PFNGLATTACHSHADER glAttachShader = NULL;
 PFNGLLINKPROGRAM glLinkProgram = NULL;
 PFNGLUSEPROGRAM glUseProgram = NULL;
 PFNGLDELETEPROGRAM glDeleteProgram = NULL;
+PFNGLGETPROGRAMIV glGetProgramiv = NULL;
+PFNGLGETPROGRAMINFOLOG glGetProgramInfoLog = NULL;
 
 PFNGLGETUNIFORMLOCATION glGetUniformLocation = NULL;
 PFNGLUNIFORM1F glUniform1f = NULL;
 PFNGLUNIFORM1FV glUniform1fv = NULL;
+PFNGLUNIFORM1I glUniform1i = NULL;
 PFNGLUNIFORMMATRIX4FV glUniformMatrix4fv = NULL;
 
 PFNGLGENVERTEXARRAYS glGenVertexArrays = NULL;
@@ -59,10 +62,13 @@ int load_gl_functions() {
     LOAD(glLinkProgram);
     LOAD(glUseProgram);
     LOAD(glDeleteProgram);
+    LOAD(glGetProgramiv);
+    LOAD(glGetProgramInfoLog);
     
     LOAD(glGetUniformLocation);
     LOAD(glUniform1f);
     LOAD(glUniform1fv);
+    LOAD(glUniform1i);
     LOAD(glUniformMatrix4fv);
     
     LOAD(glGenVertexArrays);
