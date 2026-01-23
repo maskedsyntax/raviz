@@ -1,0 +1,35 @@
+# Maintainer: maskedsyntax <aftaab@aftaab.xyz>
+pkgname=raviz-git
+pkgver=1.0.0.r0.g$(git rev-parse --short HEAD)
+pkgrel=1
+pkgdesc="High-performance audio-reactive 3D visualizer"
+arch=('x86_64')
+url="https://github.com/maskedsyntax/raviz"
+license=('MIT')
+depends=('glibc' 'libpulse' 'fftw' 'glfw-x11' 'mesa') # glfw-wayland if preferred
+makedepends=('git' 'cmake' 'ninja')
+provides=('raviz')
+conflicts=('raviz')
+source=("git+https://github.com/maskedsyntax/raviz.git")
+md5sums=('SKIP')
+
+pkgver() {
+  cd "raviz"
+  git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build() {
+  cd "raviz"
+  cmake -B build -S . \
+    -DCMAKE_BUILD_TYPE='None' \
+    -DCMAKE_INSTALL_PREFIX='/usr' \
+    -Wno-dev
+  cmake --build build
+}
+
+package() {
+  cd "raviz"
+  DESTDIR="$pkgdir" cmake --install build
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
+
