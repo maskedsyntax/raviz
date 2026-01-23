@@ -10,7 +10,7 @@ include(FetchContent)
 
 find_package(PkgConfig REQUIRED)
 if(PKG_CONFIG_FOUND)
-    pkg_check_modules(PULSE libpulse-simple)
+    pkg_check_modules(PULSE libpulse-simple libpulse)
     pkg_check_modules(FFTW fftw3)
     pkg_check_modules(GLFW glfw3)
 endif()
