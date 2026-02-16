@@ -1,15 +1,17 @@
+<div align="center">
+
 # raviz
 
-<p align="center">
-  <img src="assets/logo.png" width="200" height="200" alt="Raviz Logo">
-</p>
+<img src="assets/logo.png" width="200" height="200" alt="Raviz Logo">
 
-High-performance audio-reactive 3D visualizer for Linux.
+### High-performance audio-reactive 3D visualizer for Linux.
 
 Renders a glowing, deformable 3D sphere that reacts to system audio in real time. Runs in a transparent, borderless window using OpenGL 3.3+.
 
-![License](https://img.shields.io/github/license/maskedsyntax/raviz)
-![Release](https://img.shields.io/github/v/release/maskedsyntax/raviz)
+[![License](https://img.shields.io/github/license/maskedsyntax/raviz)](https://github.com/maskedsyntax/raviz/blob/master/LICENSE)
+[![Release](https://img.shields.io/github/v/release/maskedsyntax/raviz)](https://github.com/maskedsyntax/raviz/releases)
+
+</div>
 
 ## Features
 
