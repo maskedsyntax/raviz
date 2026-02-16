@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Raviz
+Comment=High-performance audio-reactive 3D visualizer
+Exec=raviz
+Icon=raviz
+Type=Application
+Categories=Graphics;Utility;
+Terminal=false

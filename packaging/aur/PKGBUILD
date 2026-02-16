@@ -1,6 +1,6 @@
 # Maintainer: maskedsyntax <aftaab@aftaab.xyz>
 pkgname=raviz-git
-pkgver=1.0.0.r0.g$(git rev-parse --short HEAD)
+pkgver=1.1.0.r0.g$(git rev-parse --short HEAD)
 pkgrel=1
 pkgdesc="High-performance audio-reactive 3D visualizer"
 arch=('x86_64')

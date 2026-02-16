@@ -1,5 +1,7 @@
 #include "render.h"
 #include "gl_loader.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include <GLFW/glfw3.h>
 #include <cglm/cglm.h>
 #include <stdio.h>
@@ -7,6 +9,27 @@
 #include <math.h>
 
 #define MAX_FFT_BINS 64
+
+void set_window_icon(GLFWwindow* window) {
+    GLFWimage images[1];
+    int channels;
+    // Try multiple possible locations for the logo
+    const char* paths[] = {
+        "assets/logo.png",
+        "/usr/share/pixmaps/raviz.png",
+        "/usr/share/raviz/logo.png"
+    };
+
+    for (int i = 0; i < 3; i++) {
+        images[0].pixels = stbi_load(paths[i], &images[0].width, &images[0].height, &channels, 4);
+        if (images[0].pixels) {
+            glfwSetWindowIcon(window, 1, images);
+            stbi_image_free(images[0].pixels);
+            return;
+        }
+    }
+    fprintf(stderr, "[Render] Could not find logo.png for window icon.\n");
+}
 
 struct RenderContext {
     GLFWwindow *window;
@@ -315,6 +338,8 @@ RenderContext* render_init(const RavizConfig *config) {
         free(ctx);
         return NULL;
     }
+
+    set_window_icon(ctx->window);
     
     // Set user pointer for callbacks
     glfwSetWindowUserPointer(ctx->window, ctx);
