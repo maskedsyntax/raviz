@@ -118,23 +118,23 @@ install(FILES raviz.desktop DESTINATION share/applications)
 set(CPACK_PACKAGE_NAME "raviz")
 set(CPACK_PACKAGE_VENDOR "maskedsyntax")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "High-performance audio-reactive 3D visualizer")
-set(CPACK_PACKAGE_VERSION "1.1.0")
+set(CPACK_PACKAGE_VERSION "1.1.1")
 set(CPACK_PACKAGE_VERSION_MAJOR "1")
 set(CPACK_PACKAGE_VERSION_MINOR "1")
-set(CPACK_PACKAGE_VERSION_PATCH "0")
+set(CPACK_PACKAGE_VERSION_PATCH "1")
 set(CPACK_PACKAGE_CONTACT "maskedsyntax <aftaab@aftaab.xyz>")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 
 # DEB
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${CPACK_PACKAGE_CONTACT}")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libpulse0, libfftw3-3, libglfw3, libgl1")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/maskedsyntax/raviz")
 
 # RPM
 set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+set(CPACK_RPM_PACKAGE_AUTOREQ ON)
 set(CPACK_RPM_PACKAGE_GROUP "Amusements/Graphics")
-set(CPACK_RPM_PACKAGE_REQUIRES "pulseaudio-libs, fftw, glfw, mesa-libGL")
 set(CPACK_RPM_PACKAGE_URL "https://github.com/maskedsyntax/raviz")
 
 include(CPack)

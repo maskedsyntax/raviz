@@ -29,12 +29,12 @@ Download the latest `.deb` or `.rpm` release from the [Releases Page](https://gi
 
 **Debian/Ubuntu:**
 ```bash
-sudo apt install ./raviz-1.1.0-Linux.deb
+sudo apt install ./raviz-1.1.1-Linux.deb
 ```
 
 **Fedora/RHEL:**
 ```bash
-sudo rpm -i raviz-1.1.0-Linux.rpm
+sudo rpm -i raviz-1.1.1-Linux.rpm
 ```
 
 ### Arch Linux
