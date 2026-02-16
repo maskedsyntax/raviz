@@ -2,7 +2,7 @@
 
 # raviz
 
-<img src="assets/logo.png" width="200" height="200" alt="Raviz Logo">
+<img src="assets/logo.png" width="110" height="110" alt="Raviz Logo">
 
 ### High-performance audio-reactive 3D visualizer for Linux.
 
