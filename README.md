@@ -1,5 +1,9 @@
 # raviz
 
+<p align="center">
+  <img src="assets/logo.png" width="200" height="200" alt="Raviz Logo">
+</p>
+
 High-performance audio-reactive 3D visualizer for Linux.
 
 Renders a glowing, deformable 3D sphere that reacts to system audio in real time. Runs in a transparent, borderless window using OpenGL 3.3+.
