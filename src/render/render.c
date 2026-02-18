@@ -237,6 +237,24 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    RenderContext *ctx = (RenderContext*)glfwGetWindowUserPointer(window);
+    if (!ctx) return;
+
+    // Only resize if Ctrl is pressed
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || 
+        glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
+        
+        ctx->config.sphere_scale += (float)yoffset * 0.1f;
+        
+        // Limits
+        if (ctx->config.sphere_scale < 0.1f) ctx->config.sphere_scale = 0.1f;
+        if (ctx->config.sphere_scale > 5.0f) ctx->config.sphere_scale = 5.0f;
+        
+        printf("Sphere Scale: %.1f\n", ctx->config.sphere_scale);
+    }
+}
+
 void generate_sphere(int lat_segments, int lon_segments, GLuint *vao, GLuint *vbo, GLuint *ebo, int *num_indices) {
     int num_vertices = (lat_segments + 1) * (lon_segments + 1);
     *num_indices = lat_segments * lon_segments * 6;
@@ -344,6 +362,7 @@ RenderContext* render_init(const RavizConfig *config) {
     // Set user pointer for callbacks
     glfwSetWindowUserPointer(ctx->window, ctx);
     glfwSetKeyCallback(ctx->window, key_callback);
+    glfwSetScrollCallback(ctx->window, scroll_callback);
     
     glfwMakeContextCurrent(ctx->window);
     glfwSetFramebufferSizeCallback(ctx->window, framebuffer_size_callback);
@@ -420,6 +439,7 @@ void render_draw(RenderContext *ctx) {
     glm_mat4_identity(projection);
     
     glm_rotate(model, ctx->time * ctx->config.rotation_speed, (vec3){0.0f, 1.0f, 0.0f});
+    glm_scale(model, (vec3){ctx->config.sphere_scale, ctx->config.sphere_scale, ctx->config.sphere_scale});
     glm_translate(view, (vec3){0.0f, 0.0f, -3.0f});
     glm_perspective(glm_rad(45.0f), aspect, 0.1f, 100.0f, projection);
     

@@ -17,6 +17,7 @@ typedef struct {
     int fft_bins;       // Number of output bins (e.g. 64)
     int sphere_lat;     // Latitude segments
     int sphere_lon;     // Longitude segments
+    float sphere_scale; // Scale of the sphere (default: 1.0)
     ColorMode color_mode;
     float intensity;    // Global scaling for reaction
     float rotation_speed;

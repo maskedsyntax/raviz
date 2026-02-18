@@ -73,6 +73,7 @@ Raviz automatically creates a configuration file at `~/.config/raviz/config.toml
 fps = 30
 sphere_lat = 40
 sphere_lon = 40
+sphere_scale = 1.0         # Default sphere size
 rotation_speed = 0.05
 window_opacity = 1.0       # 0.0 (Transparent) to 1.0 (Black)
 color_mode = "none"        # "none", "static", "reactive"
@@ -96,6 +97,7 @@ intensity = 1.0
 | **F5** | Reload Shaders (Hot-reload `render.c` logic if recompiled, mainly for dev) |
 | **UP** | Increase Intensity |
 | **DOWN** | Decrease Intensity |
+| **CTRL + SCROLL** | Resize Sphere (0.1 - 5.0) |
 
 ## Usage
 
@@ -106,6 +108,7 @@ raviz
 
 **CLI Overrides:**
 - `--opacity <0.0-1.0>`: Set window opacity.
+- `--scale <float>`: Set initial sphere scale.
 - `--device <name>`: Manually specify PulseAudio source.
 - `--fps <int>`: Limit FPS.
 - `--intensity <float>`: Reaction multiplier.

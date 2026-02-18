@@ -20,6 +20,7 @@ void config_init_defaults(RavizConfig *config) {
     config->fft_bins = 64;
     config->sphere_lat = 40;
     config->sphere_lon = 40;
+    config->sphere_scale = 1.0f;
     config->color_mode = COLOR_MODE_NONE; 
     config->intensity = 1.0f;
     config->rotation_speed = 0.05f;
@@ -50,6 +51,7 @@ static void ensure_config_exists(const char *path) {
         fprintf(f, "fps = 30\n");
         fprintf(f, "sphere_lat = 40\n");
         fprintf(f, "sphere_lon = 40\n");
+        fprintf(f, "sphere_scale = 1.0\n");
         fprintf(f, "rotation_speed = 0.05\n");
         fprintf(f, "window_opacity = 1.0\n");
         fprintf(f, "color_mode = \"none\" # none, static, reactive\n\n");
@@ -99,6 +101,9 @@ void config_load(RavizConfig *config) {
 
         toml_datum_t lon = toml_int_in(render, "sphere_lon");
         if (lon.ok) config->sphere_lon = (int)lon.u.i;
+
+        toml_datum_t scale = toml_double_in(render, "sphere_scale");
+        if (scale.ok) config->sphere_scale = (float)scale.u.d;
 
         toml_datum_t rot = toml_double_in(render, "rotation_speed");
         if (rot.ok) config->rotation_speed = (float)rot.u.d;
@@ -165,6 +170,8 @@ int config_parse_args(RavizConfig *config, int argc, char **argv) {
             config->window_opacity = atof(argv[++i]);
         } else if (strcmp(argv[i], "--rotation-speed") == 0 && i + 1 < argc) {
             config->rotation_speed = atof(argv[++i]);
+        } else if (strcmp(argv[i], "--scale") == 0 && i + 1 < argc) {
+            config->sphere_scale = atof(argv[++i]);
         } else if (strcmp(argv[i], "--device") == 0 && i + 1 < argc) {
             config->audio_device = argv[++i];
         } else if (strcmp(argv[i], "--help") == 0) {
@@ -174,6 +181,7 @@ int config_parse_args(RavizConfig *config, int argc, char **argv) {
             printf("  --bins <int>           Number of frequency bins (default: 64)\n");
             printf("  --lat <int>            Sphere latitude segments (default: 40)\n");
             printf("  --lon <int>            Sphere longitude segments (default: 40)\n");
+            printf("  --scale <float>        Sphere scale (default: 1.0)\n");
             printf("  --color <mode>         static|reactive|none (default: none)\n");
             printf("  --no-color             Disable color\n");
             printf("  --intensity <float>    Reaction intensity (default: 1.0)\n");
